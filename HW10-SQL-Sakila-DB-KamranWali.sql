@@ -143,6 +143,113 @@ FROM customer c
 GROUP BY c.customer_id
 ORDER BY c.last_name ASC
 
+-- 7a. The music of Queen and Kris Kristofferson have seen an unlikely resurgence. As an unintended consequence, 
+--     films starting with the letters K and Q have also soared in popularity. 
+--     Use subqueries to display the titles of movies starting with the letters K and Q whose language is English.
+
+SELECT * FROM film
+WHERE (title LIKE 'K%'
+OR title LIKE 'Q%');
+
+-- 7b. Use subqueries to display all actors who appear in the film Alone Trip.
+
+SELECT * FROM actor A 
+WHERE EXISTS (SELECT '1' FROM film_actor FA, film F 
+               WHERE A.actor_id = FA.actor_id
+               AND FA.film_id = F.film_id
+               AND F.title = 'ALONE TRIP');
+               
+-- 7c. You want to run an email marketing campaign in Canada, for which you will need the names and email addresses 
+--     of all Canadian customers. Use joins to retrieve this information.
+               
+SELECT CU.first_name, CU.last_name, CU.email
+FROM customer CU
+WHERE EXISTS (SELECT '1' FROM address AD, city CY, country CN
+              WHERE CU.address_id = AD.address_id
+              AND AD.city_id = CY.city_id
+              AND CY.city_id = CN.country_id
+              AND CN.country = 'Canada');
+
+-- 7d. Sales have been lagging among young families, and you wish to target all family movies for a promotion. 
+--     Identify all movies categorized as family films.   
+
+SELECT * FROM film F
+WHERE EXISTS (SELECT '1' FROM film_category FC, category C
+              WHERE F.film_id = FC.film_id
+              AND FC.category_id = C.category_id
+              AND C.name = 'Family');
+              
+-- 7e. Display the most frequently rented movies in descending order.
+
+SELECT F.title, COUNT(F.title) as 'MOST_RENTED'                 
+FROM film F                                              
+JOIN inventory I                                         
+on(F.film_id = I.film_id)                    
+JOIN rental R                                            
+ON (I.inventory_id = R.inventory_id)       
+GROUP by F.title                                          
+ORDER BY MOST_RENTED desc;  
+
+-- 7f. Write a query to display how much business, in dollars, each store brought in.
+
+SELECT S.store_id, SUM(P.amount) AS TOTAL_AMOUNT        
+FROM payment P                                 
+JOIN rental R                                  
+ON (P.rental_id = R.rental_id)                 
+JOIN inventory I                              
+ON ( I.inventory_id = R.inventory_id)          
+JOIN store S                                   
+ON (S.store_id = I.store_id)                   
+GROUP BY S.store_id; 
+
+-- 7g. Write a query to display for each store its store ID, city, and country. 
+
+SELECT ST.store_id, CY.city, CN.country
+FROM store ST 
+JOIN address AD
+ON (ST.address_id = Ad.address_id)
+JOIN CITY CY
+ON (AD.city_id = CY.city_id)
+JOIN country CN
+ON (CN.country_id = CY.country_id);
+
+-- 7h. List the top five genres in gross revenue in descending order. (Hint: you may need to use the following tables: category, 
+--     film_category, inventory, payment, and rental.)
+
+
+
+                                                                                 
+
+
+
+
+
+
+
+
+
+                      
+
+
+
+
+
+
+
+
+ 
+
+    
+
+              
+              
+              
+
+
+
+
+
+
 
                         
 
