@@ -41,7 +41,7 @@ ORDER BY last_name, first_name;
 --     Afghanistan, Bangladesh, and China
 
 SELECT * FROM country
-WHERE country IN ('Afghanistan', 'Bangladesh', 'China')
+WHERE country IN ('Afghanistan', 'Bangladesh', 'China');
 
 -- 3a. You want to keep a description of each actor. 
 --     You don't think you will be performing queries on a description, 
@@ -73,17 +73,10 @@ HAVING COUNT(*) >= 2
 -- 4c. The actor `HARPO WILLIAMS` was accidentally entered in the `actor` table as `GROUCHO WILLIAMS`. 
 -- Write a query to fix the record.
 
--- SELECT * FROM ACTOR
--- WHERE LAST_NAME = 'WILLIAMS'
-
 UPDATE actor
 SET FIRST_NAME = 'HARPO'
-WHERE ACTOR_ID = 172;
-
--- COMMIT;
-
-SELECT * FROM ACTOR
-WHERE ACTOR_ID = 172;
+WHERE LAST_NAME = 'WILLIAMS'
+AND FIRST_NAME = 'GROUCHO';
 
 -- 4d. Perhaps we were too hasty in changing `GROUCHO` to `HARPO`. 
 --     It turns out that `GROUCHO` was the correct name after all! In a single query, 
@@ -91,13 +84,9 @@ WHERE ACTOR_ID = 172;
 
 UPDATE actor
 SET FIRST_NAME = 'GROUCHO'
-WHERE ACTOR_ID = 172
-AND FIRST_NAME = 'HARPO';
+WHERE FIRST_NAME = 'HARPO'
+AND LAST_NAME = 'WILLIAMS';
 
--- COMMIT;
-
--- SELECT * FROM ACTOR
--- WHERE ACTOR_ID = 172;
 
 -- 5a. You cannot locate the schema of the `address` table. Which query would you use to re-create it?
 
@@ -215,6 +204,50 @@ ON (CN.country_id = CY.country_id);
 
 -- 7h. List the top five genres in gross revenue in descending order. (Hint: you may need to use the following tables: category, 
 --     film_category, inventory, payment, and rental.)
+
+SELECT c.name, sum(p.amount) 
+FROM category c
+JOIN film_category fc
+ON (c.category_id = fc.category_id)
+JOIN inventory i
+ON (i.film_id = fc.film_id)
+JOIN rental r
+ON (r.inventory_id = i.inventory_id)
+JOIN payment p
+ON (p.rental_id = r.rental_id)
+GROUP BY c.name
+ORDER BY sum(p.amount) DESC
+LIMIT 5
+
+-- 8a. In your new role as an executive, you would like to have an easy way of viewing the Top five genres by gross revenue. 
+--     Use the solution from the problem above to create a view. If you haven't solved 7h, you can substitute another query to create a view.
+
+CREATE VIEW sakila.top_five_genres AS
+SELECT c.name, sum(p.amount) AS 'gross_amount'
+FROM category c
+JOIN film_category fc
+ON (c.category_id = fc.category_id)
+JOIN inventory i
+ON (i.film_id = fc.film_id)
+JOIN rental r
+ON (r.inventory_id = i.inventory_id)
+JOIN payment p
+ON (p.rental_id = r.rental_id)
+GROUP BY c.name
+ORDER BY sum(p.amount) DESC
+LIMIT 5
+
+-- 8b. How would you display the view that you created in 8a?
+
+SELECT * FROM sakila.top_five_genres;
+
+-- 8c. You find that you no longer need the view top_five_genres. Write a query to delete it.
+
+DROP VIEW sakila.top_five_genres;
+
+
+                                                                             
+
 
 
 
